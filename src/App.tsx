@@ -89,6 +89,36 @@ const aiProjects = [
 
 const skills = ["Python", "Machine Learning", "Artificial Intelligence", "Web Development", "Linux", "Data Science", "Bash", "Android Modding"];
 
+const AnimatedTitle = ({ text, className = "" }: { text: string, className?: string }) => {
+  const words = text.split(" ");
+  return (
+    <motion.h2
+      className={`flex flex-wrap justify-center overflow-hidden ${className}`}
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: false, margin: "-50px" }}
+      variants={{
+        visible: { transition: { staggerChildren: 0.1 } },
+        hidden: {}
+      }}
+    >
+      {words.map((word, i) => (
+        <span key={i} className="overflow-hidden inline-block mr-[0.25em] last:mr-0">
+          <motion.span
+            className="inline-block"
+            variants={{
+              hidden: { y: "100%", rotate: 5, opacity: 0 },
+              visible: { y: 0, rotate: 0, opacity: 1, transition: { type: "spring", damping: 20, stiffness: 200 } }
+            }}
+          >
+            {word}
+          </motion.span>
+        </span>
+      ))}
+    </motion.h2>
+  );
+};
+
 export default function App() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
@@ -151,36 +181,50 @@ export default function App() {
             <motion.div 
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 1, duration: 1 }}
-              className="absolute bottom-12 text-[10px] tracking-[0.3em] uppercase text-muted z-20"
+              transition={{ delay: 1.5, duration: 1 }}
+              className="absolute bottom-12 text-[10px] tracking-[0.3em] uppercase text-muted z-20 flex flex-col items-center gap-4"
             >
-              Scroll to explore
+              <span>Scroll to explore</span>
+              <motion.div 
+                animate={{ y: [0, 10, 0] }} 
+                transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
+                className="w-[1px] h-12 bg-muted/50"
+              />
             </motion.div>
           }
         >
           <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 1.5, ease: [0.16, 1, 0.3, 1] }}
+            initial="hidden"
+            animate="visible"
+            variants={{
+              visible: { transition: { staggerChildren: 0.1, delayChildren: 0.2 } },
+              hidden: {}
+            }}
+            className="flex flex-col items-center"
           >
-            <h1 className="font-display text-[18vw] md:text-[14vw] leading-[0.8] tracking-tighter text-center uppercase">
-              AI & ML<br/>ENGINEER
-            </h1>
+            <div className="overflow-hidden">
+              <motion.h1 
+                variants={{ hidden: { y: "100%", rotate: 5 }, visible: { y: 0, rotate: 0, transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } } }} 
+                className="font-display text-[18vw] md:text-[14vw] leading-[0.8] tracking-tighter text-center uppercase"
+              >
+                AI & ML
+              </motion.h1>
+            </div>
+            <div className="overflow-hidden">
+              <motion.h1 
+                variants={{ hidden: { y: "100%", rotate: -5 }, visible: { y: 0, rotate: 0, transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } } }} 
+                className="font-display text-[18vw] md:text-[14vw] leading-[0.8] tracking-tighter text-center uppercase"
+              >
+                ENGINEER
+              </motion.h1>
+            </div>
           </motion.div>
         </ParallaxSection>
 
         {/* AI/ML Projects */}
         <ParallaxSection id="projects">
           <div className="w-full max-w-5xl flex flex-col items-center gap-12">
-            <motion.h2 
-              className="font-display text-5xl md:text-7xl lg:text-[8vw] uppercase tracking-tighter leading-none text-center"
-              initial={{ opacity: 0, y: 50 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: false, margin: "-50px" }}
-              transition={{ type: "spring", stiffness: 400, damping: 30 }}
-            >
-              AI / ML PROJECTS
-            </motion.h2>
+            <AnimatedTitle text="AI / ML PROJECTS" className="font-display text-5xl md:text-7xl lg:text-[8vw] uppercase tracking-tighter leading-none text-center" />
             <div className="w-full flex flex-col gap-12 mt-8">
               {aiProjects.map((project, i) => (
                 <motion.div 
@@ -190,6 +234,7 @@ export default function App() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: false, margin: "-50px" }}
                   transition={{ delay: i * 0.1, type: "spring", stiffness: 400, damping: 30 }}
+                  whileHover={{ x: 10 }}
                 >
                   <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-4 gap-4">
                     <h3 className="font-display text-4xl md:text-5xl group-hover:opacity-50 transition-opacity">{project.title}</h3>
@@ -215,15 +260,7 @@ export default function App() {
         {/* Certificates */}
         <ParallaxSection id="certificates">
           <div className="w-full max-w-5xl flex flex-col items-center gap-12">
-            <motion.h2 
-              className="font-display text-5xl md:text-7xl lg:text-[8vw] uppercase tracking-tighter leading-none text-center"
-              initial={{ opacity: 0, y: 50 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: false, margin: "-50px" }}
-              transition={{ type: "spring", stiffness: 400, damping: 30 }}
-            >
-              CERTIFICATES
-            </motion.h2>
+            <AnimatedTitle text="CERTIFICATES" className="font-display text-5xl md:text-7xl lg:text-[8vw] uppercase tracking-tighter leading-none text-center" />
             <div className="w-full flex flex-col gap-6 mt-8">
               {certificates.map((cert, i) => (
                 <motion.a 
@@ -263,16 +300,7 @@ export default function App() {
         {/* About */}
         <ParallaxSection id="about">
           <div className="max-w-3xl text-center flex flex-col items-center gap-12">
-            <motion.h2 
-              className="font-display text-6xl md:text-8xl lg:text-[10vw] uppercase tracking-tighter leading-none"
-              initial={{ opacity: 0, y: 50 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: false, margin: "-50px" }}
-              whileHover={{ scale: 1.05, opacity: 0.4 }}
-              transition={{ type: "spring", stiffness: 400, damping: 30 }}
-            >
-              ABOUT
-            </motion.h2>
+            <AnimatedTitle text="ABOUT" className="font-display text-6xl md:text-8xl lg:text-[10vw] uppercase tracking-tighter leading-none" />
             <p className="text-xl md:text-3xl font-light leading-relaxed">
               Machine Learning & AI Engineer proficient in Python. Bridging the gap between intelligent systems and web development. Linux enthusiast since 2020.
             </p>
@@ -309,23 +337,16 @@ export default function App() {
         {/* Contact */}
         <ParallaxSection id="contact">
           <div className="flex flex-col items-center gap-12">
-            <motion.h2 
-              className="font-display text-6xl md:text-8xl lg:text-[10vw] uppercase tracking-tighter leading-none"
-              initial={{ opacity: 0, y: 50 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: false, margin: "-50px" }}
-              whileHover={{ scale: 1.05, opacity: 0.4 }}
-              transition={{ type: "spring", stiffness: 400, damping: 30 }}
-            >
-              CONTACT
-            </motion.h2>
+            <AnimatedTitle text="CONTACT" className="font-display text-6xl md:text-8xl lg:text-[10vw] uppercase tracking-tighter leading-none" />
             <div className="flex flex-col items-center gap-12">
-              <a 
+              <motion.a 
                 href="mailto:sambhrmakhushi@gmail.com" 
-                className="font-display text-3xl md:text-5xl uppercase tracking-tighter hover:opacity-40 transition-opacity text-center"
+                className="font-display text-3xl md:text-5xl uppercase tracking-tighter transition-opacity text-center"
+                whileHover={{ scale: 1.05, letterSpacing: "0.05em", opacity: 0.7 }}
+                transition={{ type: "spring", stiffness: 400, damping: 30 }}
               >
                 SAMBHRMAKHUSHI@GMAIL.COM
-              </a>
+              </motion.a>
               <div className="flex gap-12 text-[10px] tracking-[0.3em] uppercase text-muted">
                 <a href="https://github.com/Sambhrama754" target="_blank" rel="noopener noreferrer" className="hover:text-fg transition-colors">Github</a>
                 <a href="https://www.kaggle.com/sambhramakhushi" target="_blank" rel="noopener noreferrer" className="hover:text-fg transition-colors">Kaggle</a>
