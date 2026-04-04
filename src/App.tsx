@@ -228,8 +228,8 @@ export default function App() {
                   target={cert.link !== "#" ? "_blank" : undefined}
                   rel={cert.link !== "#" ? "noopener noreferrer" : undefined}
                   key={i}
-                  className="flex flex-col border-b border-muted/20 pb-6 group cursor-pointer relative"
-                  whileHover={{ x: 10 }}
+                  className="flex flex-col border border-transparent border-b-muted/20 p-6 -mx-6 rounded-xl group cursor-pointer relative transition-all duration-300 hover:bg-muted/5 hover:shadow-2xl hover:border-muted/10"
+                  whileHover={{ x: 8, y: -4 }}
                   transition={{ type: "spring", stiffness: 400, damping: 30 }}
                 >
                   <div className="flex flex-col md:flex-row justify-between items-start md:items-center w-full">
