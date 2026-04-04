@@ -198,10 +198,13 @@ export default function App() {
                     </div>
                   </div>
                   <p className="text-lg md:text-xl font-light text-muted mb-6 max-w-2xl">{project.description}</p>
-                  <div className="flex flex-wrap gap-2">
-                    {project.tech.map((t, idx) => (
-                      <span key={idx} className="text-[9px] tracking-[0.2em] uppercase border border-muted/30 px-3 py-1 rounded-full">{t}</span>
-                    ))}
+                  <div className="flex flex-col gap-3">
+                    <span className="text-[10px] tracking-[0.2em] uppercase text-muted font-medium">Technologies Used:</span>
+                    <div className="flex flex-wrap gap-2">
+                      {project.tech.map((t, idx) => (
+                        <span key={idx} className="text-[9px] tracking-[0.2em] uppercase border border-muted/30 bg-muted/5 px-3 py-1.5 rounded-full text-fg/90 hover:bg-fg hover:text-bg transition-colors cursor-default">{t}</span>
+                      ))}
+                    </div>
                   </div>
                 </motion.div>
               ))}
@@ -228,8 +231,8 @@ export default function App() {
                   target={cert.link !== "#" ? "_blank" : undefined}
                   rel={cert.link !== "#" ? "noopener noreferrer" : undefined}
                   key={i}
-                  className="flex flex-col border border-transparent border-b-muted/20 p-6 -mx-6 rounded-xl group cursor-pointer relative transition-all duration-300 hover:bg-muted/5 hover:shadow-2xl hover:border-muted/10"
-                  whileHover={{ x: 8, y: -4 }}
+                  className="flex flex-col border-b border-muted/20 pb-6 group cursor-pointer relative"
+                  whileHover={{ x: 10 }}
                   transition={{ type: "spring", stiffness: 400, damping: 30 }}
                 >
                   <div className="flex flex-col md:flex-row justify-between items-start md:items-center w-full">
