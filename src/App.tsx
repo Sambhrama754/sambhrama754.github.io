@@ -55,10 +55,10 @@ const certificates = [
     details: "Comprehensive certification covering neural networks, deep learning, and practical ML algorithms using Python, TensorFlow, and Scikit-learn."
   },
   { 
-    title: "SCIENTIFIC COMPUTING WITH PYTHON", 
+    title: "PYTHON CERTIFICATION", 
     role: "FREECODECAMP", 
     year: "IN PROGRESS", 
-    link: "#",
+    link: "https://www.freecodecamp.org/learn/python-v9",
     status: "In Progress",
     details: "Learning core programming concepts, data structures, and algorithms using Python for scientific computing."
   },
@@ -77,15 +77,13 @@ const aiProjects = [
     title: "CROP RECOMMENDER ARDUINO",
     description: "An IoT and Machine Learning integrated system to recommend optimal crops based on soil and environmental data.",
     tech: ["Python", "Machine Learning", "Arduino", "IoT"],
-    repo: "https://github.com/Sambhrama754/Crop-reccomender-ardiuno",
-    demo: "#"
+    repo: "https://github.com/Sambhrama754/Crop-reccomender-ardiuno"
   },
   {
     title: "KAGGLE COMPETITIONS",
     description: "Active participant in various Kaggle data science and machine learning competitions. Developing predictive models and exploratory data analysis notebooks.",
     tech: ["Python", "Pandas", "Scikit-Learn", "XGBoost"],
-    repo: "https://www.kaggle.com/sambhramakhushi/competitions",
-    demo: "https://www.kaggle.com/sambhramakhushi"
+    repo: "https://www.kaggle.com/sambhramakhushi/competitions"
   }
 ];
 
@@ -197,7 +195,6 @@ export default function App() {
                     <h3 className="font-display text-4xl md:text-5xl group-hover:opacity-50 transition-opacity">{project.title}</h3>
                     <div className="flex gap-4 text-[10px] tracking-[0.2em] uppercase">
                       <a href={project.repo} className="hover:text-fg text-muted transition-colors">[ REPO ]</a>
-                      <a href={project.demo} className="hover:text-fg text-muted transition-colors">[ DEMO ]</a>
                     </div>
                   </div>
                   <p className="text-lg md:text-xl font-light text-muted mb-6 max-w-2xl">{project.description}</p>
@@ -276,20 +273,33 @@ export default function App() {
             <p className="text-xl md:text-3xl font-light leading-relaxed">
               Machine Learning & AI Engineer proficient in Python. Bridging the gap between intelligent systems and web development. Linux enthusiast since 2020.
             </p>
-            <div className="flex flex-wrap justify-center gap-3 mt-4">
+            <motion.div 
+              className="flex flex-wrap justify-center gap-3 mt-4"
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: false, margin: "-50px" }}
+              variants={{
+                visible: {
+                  transition: {
+                    staggerChildren: 0.1
+                  }
+                },
+                hidden: {}
+              }}
+            >
               {skills.map((skill, i) => (
                 <motion.div
                   key={i}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: false, margin: "-50px" }}
-                  transition={{ delay: i * 0.05, type: "spring", stiffness: 400, damping: 30 }}
+                  variants={{
+                    hidden: { opacity: 0, y: 20 },
+                    visible: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 400, damping: 30 } }
+                  }}
                   className="border border-muted/30 px-5 py-2 rounded-full text-[10px] tracking-[0.2em] uppercase hover:bg-fg hover:text-bg transition-colors cursor-default"
                 >
                   {skill}
                 </motion.div>
               ))}
-            </div>
+            </motion.div>
           </div>
         </ParallaxSection>
 
@@ -317,6 +327,9 @@ export default function App() {
                 <a href="https://github.com/Sambhrama754" target="_blank" rel="noopener noreferrer" className="hover:text-fg transition-colors">Github</a>
                 <a href="https://www.kaggle.com/sambhramakhushi" target="_blank" rel="noopener noreferrer" className="hover:text-fg transition-colors">Kaggle</a>
               </div>
+              <p className="text-muted text-xs tracking-widest uppercase mt-8">
+                &copy; {new Date().getFullYear()} Sambhrama Khushi. All rights reserved.
+              </p>
             </div>
           </div>
         </ParallaxSection>
