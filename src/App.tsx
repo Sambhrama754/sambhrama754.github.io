@@ -86,13 +86,6 @@ const aiProjects = [
     tech: ["Python", "Pandas", "Scikit-Learn", "XGBoost"],
     repo: "https://www.kaggle.com/sambhramakhushi/competitions",
     demo: "https://www.kaggle.com/sambhramakhushi"
-  },
-  {
-    title: "NEURAL VISION",
-    description: "Real-time object detection pipeline optimized for edge devices using quantized models.",
-    tech: ["Python", "TensorFlow", "OpenCV"],
-    repo: "#",
-    demo: "#"
   }
 ];
 
