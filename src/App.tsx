@@ -30,14 +30,10 @@ function ParallaxSection({
   const opacity = useTransform(scrollYProgress, [0, 0.05, 0.95, 1], [0, 1, 1, 0]);
   // Scale down slightly when entering/leaving
   const scale = useTransform(scrollYProgress, [0, 0.05, 0.95, 1], [0.98, 1, 1, 0.98]);
-  
-  // Optimized blur: rounding the pixel value prevents expensive sub-pixel recalculations (jank)
-  const blurValue = useTransform(scrollYProgress, [0, 0.05, 0.95, 1], [12, 0, 0, 12]);
-  const filter = useTransform(blurValue, (v) => `blur(${Math.round(v)}px)`);
 
   return (
     <section id={id} ref={ref} className={`min-h-screen py-32 w-full snap-start relative flex items-center justify-center px-6 ${className}`}>
-      <motion.div style={{ y, opacity, scale, filter, willChange: "transform, opacity, filter" }} className="w-full max-w-7xl mx-auto flex flex-col items-center justify-center z-10">
+      <motion.div style={{ y, opacity, scale, willChange: "transform, opacity" }} className="w-full max-w-7xl mx-auto flex flex-col items-center justify-center z-10">
         {children}
       </motion.div>
       {overlay}
@@ -341,8 +337,8 @@ export default function App() {
             <div className="flex flex-col items-center gap-12">
               <motion.a 
                 href="mailto:sambhrmakhushi@gmail.com" 
-                className="font-display text-3xl md:text-5xl uppercase tracking-tighter transition-opacity text-center"
-                whileHover={{ scale: 1.05, letterSpacing: "0.05em", opacity: 0.7 }}
+                className="font-display text-3xl md:text-5xl uppercase tracking-tighter transition-opacity text-center inline-block"
+                whileHover={{ scale: 1.05, opacity: 0.7 }}
                 transition={{ type: "spring", stiffness: 400, damping: 30 }}
               >
                 SAMBHRMAKHUSHI@GMAIL.COM
