@@ -200,7 +200,7 @@ export default function App() {
   });
 
   return (
-    <div className="bg-bg text-fg selection:bg-fg selection:text-bg">
+    <div className="bg-bg text-fg selection:bg-fg selection:text-bg transition-colors duration-500 ease-in-out">
       <div className="grain"></div>
       <Toast />
 
