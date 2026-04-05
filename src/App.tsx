@@ -43,18 +43,67 @@ const SafeLink = ({ href, children, className, whileHover, transition, ...props 
     }
 
     setIsChecking(true);
-    try {
-      const res = await fetch(`https://api.codetabs.com/v1/proxy/?quest=${encodeURIComponent(href)}`);
-      if (res.status >= 400) {
-        window.dispatchEvent(new CustomEvent('show-toast', { detail: "This link is broken or unavailable (404)." }));
-      } else {
-        window.open(href, "_blank", "noopener,noreferrer");
+    
+    let attempt = 0;
+    const maxRetries = 2;
+    let success = false;
+    let errorMessage = "Unable to verify link.";
+    let shouldOpenAnyway = false;
+
+    while (attempt <= maxRetries && !success) {
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 6000); // 6s timeout
+        
+        const res = await fetch(`https://api.codetabs.com/v1/proxy/?quest=${encodeURIComponent(href)}`, {
+          signal: controller.signal
+        });
+        
+        clearTimeout(timeoutId);
+
+        if (res.ok) {
+          success = true;
+          window.open(href, "_blank", "noopener,noreferrer");
+          break;
+        } else {
+          if (res.status === 404) {
+            errorMessage = "This link is broken (404 Not Found).";
+            break; // No point retrying a 404
+          } else if (res.status >= 500) {
+            errorMessage = `Server error (${res.status}).`;
+            // Will retry on 5xx errors
+          } else {
+            errorMessage = `Link unavailable (Status: ${res.status}).`;
+            break; // Don't retry 4xx errors
+          }
+        }
+      } catch (err: any) {
+        if (err.name === 'AbortError') {
+          errorMessage = "Connection timed out.";
+        } else {
+          // If the proxy itself is blocked by CORS or network issues, we fallback to opening the link
+          shouldOpenAnyway = true;
+          break;
+        }
       }
-    } catch (err) {
-      window.open(href, "_blank", "noopener,noreferrer");
-    } finally {
-      setIsChecking(false);
+      
+      attempt++;
+      if (!success && attempt <= maxRetries && !shouldOpenAnyway) {
+        await new Promise(resolve => setTimeout(resolve, 1000)); // Wait 1s before retrying
+      }
     }
+
+    if (!success) {
+      if (shouldOpenAnyway) {
+        window.open(href, "_blank", "noopener,noreferrer");
+      } else {
+        window.dispatchEvent(new CustomEvent('show-toast', { 
+          detail: `${errorMessage} ${attempt > 1 ? '(After retries)' : ''}`.trim() 
+        }));
+      }
+    }
+
+    setIsChecking(false);
   };
 
   return (
@@ -332,7 +381,7 @@ export default function App() {
                   transition={{ type: "spring", stiffness: 400, damping: 30 }}
                 >
                   <div className="flex flex-col md:flex-row justify-between items-start md:items-center w-full">
-                    <h3 className="font-display text-3xl md:text-5xl group-hover:opacity-50 transition-opacity flex items-center gap-4">
+                    <h3 className="font-display text-3xl md:text-5xl transition-all duration-300 flex items-center gap-4 group-hover:text-fg/70 group-hover:underline decoration-1 underline-offset-8">
                       {cert.title}
                       {cert.link !== "#" && <ExternalLink size={24} className="opacity-0 group-hover:opacity-100 transition-opacity" />}
                     </h3>
