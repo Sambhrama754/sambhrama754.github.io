@@ -5,7 +5,71 @@
 
 import { motion, useScroll, useTransform, useMotionValueEvent } from "motion/react";
 import { useRef, useState, useEffect } from "react";
-import { Sun, Moon, ExternalLink } from "lucide-react";
+import { Sun, Moon, ExternalLink, AlertCircle } from "lucide-react";
+
+const Toast = () => {
+  const [toast, setToast] = useState<{ message: string, visible: boolean }>({ message: "", visible: false });
+
+  useEffect(() => {
+    const handleToast = (e: any) => {
+      setToast({ message: e.detail, visible: true });
+      setTimeout(() => setToast(prev => ({ ...prev, visible: false })), 3000);
+    };
+    window.addEventListener('show-toast', handleToast);
+    return () => window.removeEventListener('show-toast', handleToast);
+  }, []);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 50 }}
+      animate={{ opacity: toast.visible ? 1 : 0, y: toast.visible ? 0 : 50 }}
+      className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] flex items-center gap-2 bg-red-500/10 border border-red-500/20 text-red-500 px-4 py-2 rounded-full text-xs tracking-widest uppercase backdrop-blur-md pointer-events-none"
+    >
+      <AlertCircle size={14} />
+      {toast.message}
+    </motion.div>
+  );
+};
+
+const SafeLink = ({ href, children, className, whileHover, transition, ...props }: any) => {
+  const [isChecking, setIsChecking] = useState(false);
+
+  const handleClick = async (e: React.MouseEvent) => {
+    e.preventDefault();
+
+    if (!href || href === "#") {
+      window.dispatchEvent(new CustomEvent('show-toast', { detail: "This link is currently unavailable." }));
+      return;
+    }
+
+    setIsChecking(true);
+    try {
+      const res = await fetch(`https://api.codetabs.com/v1/proxy/?quest=${encodeURIComponent(href)}`);
+      if (res.status >= 400) {
+        window.dispatchEvent(new CustomEvent('show-toast', { detail: "This link is broken or unavailable (404)." }));
+      } else {
+        window.open(href, "_blank", "noopener,noreferrer");
+      }
+    } catch (err) {
+      window.open(href, "_blank", "noopener,noreferrer");
+    } finally {
+      setIsChecking(false);
+    }
+  };
+
+  return (
+    <motion.a 
+      href={href} 
+      onClick={handleClick} 
+      className={`${className} ${isChecking ? 'opacity-50 cursor-wait' : ''}`}
+      whileHover={whileHover}
+      transition={transition}
+      {...props}
+    >
+      {children}
+    </motion.a>
+  );
+};
 
 function ParallaxSection({ 
   children, 
@@ -138,6 +202,7 @@ export default function App() {
   return (
     <div className="bg-bg text-fg selection:bg-fg selection:text-bg">
       <div className="grain"></div>
+      <Toast />
 
       {/* Minimal Header */}
       <header className="fixed top-0 left-0 w-full z-50 pointer-events-none flex justify-center">
@@ -235,7 +300,7 @@ export default function App() {
                   <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-4 gap-4">
                     <h3 className="font-display text-4xl md:text-5xl group-hover:opacity-50 transition-opacity">{project.title}</h3>
                     <div className="flex gap-4 text-[10px] tracking-[0.2em] uppercase">
-                      <a href={project.repo} className="hover:text-fg text-muted transition-colors">[ REPO ]</a>
+                      <SafeLink href={project.repo} className="hover:text-fg text-muted transition-colors">[ REPO ]</SafeLink>
                     </div>
                   </div>
                   <p className="text-lg md:text-xl font-light text-muted mb-6 max-w-2xl">{project.description}</p>
@@ -259,10 +324,8 @@ export default function App() {
             <AnimatedTitle text="CERTIFICATES" className="font-display text-5xl md:text-7xl lg:text-[8vw] uppercase tracking-tighter leading-none text-center" />
             <div className="w-full flex flex-col gap-6 mt-8">
               {certificates.map((cert, i) => (
-                <motion.a 
-                  href={cert.link !== "#" ? cert.link : undefined}
-                  target={cert.link !== "#" ? "_blank" : undefined}
-                  rel={cert.link !== "#" ? "noopener noreferrer" : undefined}
+                <SafeLink 
+                  href={cert.link}
                   key={i}
                   className="flex flex-col border-b border-muted/20 pb-6 group cursor-pointer relative"
                   whileHover={{ x: 10 }}
@@ -287,7 +350,7 @@ export default function App() {
                       </p>
                     </div>
                   </div>
-                </motion.a>
+                </SafeLink>
               ))}
             </div>
           </div>
