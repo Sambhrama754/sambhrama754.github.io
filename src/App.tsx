@@ -3,230 +3,16 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { motion, useScroll, useTransform, useMotionValueEvent } from "motion/react";
-import { useRef, useState, useEffect } from "react";
-import { Sun, Moon, ExternalLink, AlertCircle } from "lucide-react";
+import { motion, useScroll, useMotionValueEvent } from "motion/react";
+import { useState, useEffect } from "react";
+import { Sun, Moon, ExternalLink } from "lucide-react";
 
-const Toast = () => {
-  const [toast, setToast] = useState<{ message: string, visible: boolean }>({ message: "", visible: false });
+import { Toast } from "./components/ui/Toast";
+import { SafeLink } from "./components/ui/SafeLink";
+import { AnimatedTitle } from "./components/ui/AnimatedTitle";
+import { ParallaxSection } from "./components/layout/ParallaxSection";
 
-  useEffect(() => {
-    const handleToast = (e: any) => {
-      setToast({ message: e.detail, visible: true });
-      setTimeout(() => setToast(prev => ({ ...prev, visible: false })), 3000);
-    };
-    window.addEventListener('show-toast', handleToast);
-    return () => window.removeEventListener('show-toast', handleToast);
-  }, []);
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 50 }}
-      animate={{ opacity: toast.visible ? 1 : 0, y: toast.visible ? 0 : 50 }}
-      className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] flex items-center gap-2 bg-red-500/10 border border-red-500/20 text-red-500 px-4 py-2 rounded-full text-xs tracking-widest uppercase backdrop-blur-md pointer-events-none"
-    >
-      <AlertCircle size={14} />
-      {toast.message}
-    </motion.div>
-  );
-};
-
-const SafeLink = ({ href, children, className, whileHover, transition, ...props }: any) => {
-  const [isChecking, setIsChecking] = useState(false);
-
-  const handleClick = async (e: React.MouseEvent) => {
-    e.preventDefault();
-
-    if (!href || href === "#") {
-      window.dispatchEvent(new CustomEvent('show-toast', { detail: "This link is currently unavailable." }));
-      return;
-    }
-
-    setIsChecking(true);
-    
-    let attempt = 0;
-    const maxRetries = 2;
-    let success = false;
-    let errorMessage = "Unable to verify link.";
-    let shouldOpenAnyway = false;
-
-    while (attempt <= maxRetries && !success) {
-      try {
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 6000); // 6s timeout
-        
-        const res = await fetch(`https://api.codetabs.com/v1/proxy/?quest=${encodeURIComponent(href)}`, {
-          signal: controller.signal
-        });
-        
-        clearTimeout(timeoutId);
-
-        if (res.ok) {
-          success = true;
-          window.open(href, "_blank", "noopener,noreferrer");
-          break;
-        } else {
-          if (res.status === 404) {
-            errorMessage = "This link is broken (404 Not Found).";
-            break; // No point retrying a 404
-          } else if (res.status >= 500) {
-            errorMessage = `Server error (${res.status}).`;
-            // Will retry on 5xx errors
-          } else {
-            errorMessage = `Link unavailable (Status: ${res.status}).`;
-            break; // Don't retry 4xx errors
-          }
-        }
-      } catch (err: any) {
-        if (err.name === 'AbortError') {
-          errorMessage = "Connection timed out.";
-        } else {
-          // If the proxy itself is blocked by CORS or network issues, we fallback to opening the link
-          shouldOpenAnyway = true;
-          break;
-        }
-      }
-      
-      attempt++;
-      if (!success && attempt <= maxRetries && !shouldOpenAnyway) {
-        await new Promise(resolve => setTimeout(resolve, 1000)); // Wait 1s before retrying
-      }
-    }
-
-    if (!success) {
-      if (shouldOpenAnyway) {
-        window.open(href, "_blank", "noopener,noreferrer");
-      } else {
-        window.dispatchEvent(new CustomEvent('show-toast', { 
-          detail: `${errorMessage} ${attempt > 1 ? '(After retries)' : ''}`.trim() 
-        }));
-      }
-    }
-
-    setIsChecking(false);
-  };
-
-  return (
-    <motion.a 
-      href={href} 
-      onClick={handleClick} 
-      className={`${className} ${isChecking ? 'opacity-50 cursor-wait' : ''}`}
-      whileHover={whileHover}
-      transition={transition}
-      {...props}
-    >
-      {children}
-    </motion.a>
-  );
-};
-
-function ParallaxSection({ 
-  children, 
-  id, 
-  className = "", 
-  overlay 
-}: { 
-  children: React.ReactNode, 
-  id?: string, 
-  className?: string, 
-  overlay?: React.ReactNode 
-}) {
-  const ref = useRef(null);
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ["start end", "end start"]
-  });
-
-  // Parallax effects: move slightly opposite to scroll direction
-  const y = useTransform(scrollYProgress, [0, 1], ["50px", "-50px"]);
-  // Fade in and out at the very edges to prevent tall sections from disappearing while reading
-  const opacity = useTransform(scrollYProgress, [0, 0.05, 0.95, 1], [0, 1, 1, 0]);
-  // Scale down slightly when entering/leaving
-  const scale = useTransform(scrollYProgress, [0, 0.05, 0.95, 1], [0.98, 1, 1, 0.98]);
-
-  return (
-    <section id={id} ref={ref} className={`min-h-screen py-32 w-full snap-start relative flex items-center justify-center px-6 ${className}`}>
-      <motion.div style={{ y, opacity, scale, willChange: "transform, opacity" }} className="w-full max-w-7xl mx-auto flex flex-col items-center justify-center z-10">
-        {children}
-      </motion.div>
-      {overlay}
-    </section>
-  );
-}
-
-const certificates = [
-  { 
-    title: "MACHINE LEARNING WITH PYTHON", 
-    role: "FREECODECAMP", 
-    year: "2024", 
-    link: "https://www.freecodecamp.org/certification/sambhrama27/machine-learning-with-python-v7",
-    status: "Completed",
-    details: "Comprehensive certification covering neural networks, deep learning, and practical ML algorithms using Python, TensorFlow, and Scikit-learn."
-  },
-  { 
-    title: "PYTHON CERTIFICATION", 
-    role: "FREECODECAMP", 
-    year: "IN PROGRESS", 
-    link: "https://www.freecodecamp.org/learn/python-v9",
-    status: "In Progress",
-    details: "Learning core programming concepts, data structures, and algorithms using Python for scientific computing."
-  },
-  { 
-    title: "CS50: INTRO TO COMPUTER SCIENCE", 
-    role: "HARVARD UNIVERSITY", 
-    year: "IN PROGRESS", 
-    link: "#",
-    status: "In Progress",
-    details: "Harvard's premier introduction to the intellectual enterprises of computer science and the art of programming."
-  },
-];
-
-const aiProjects = [
-  {
-    title: "CROP RECOMMENDER ARDUINO",
-    description: "An IoT and Machine Learning integrated system to recommend optimal crops based on soil and environmental data.",
-    tech: ["Python", "Machine Learning", "Arduino", "IoT"],
-    repo: "https://github.com/Sambhrama754/Crop-reccomender-ardiuno"
-  },
-  {
-    title: "KAGGLE COMPETITIONS",
-    description: "Active participant in various Kaggle data science and machine learning competitions. Developing predictive models and exploratory data analysis notebooks.",
-    tech: ["Python", "Pandas", "Scikit-Learn", "XGBoost"],
-    repo: "https://www.kaggle.com/sambhramakhushi/competitions"
-  }
-];
-
-const skills = ["Python", "Machine Learning", "Artificial Intelligence", "Web Development", "Linux", "Data Science", "Bash", "Android Modding"];
-
-const AnimatedTitle = ({ text, className = "" }: { text: string, className?: string }) => {
-  const words = text.split(" ");
-  return (
-    <motion.h2
-      className={`flex flex-wrap justify-center overflow-hidden ${className}`}
-      initial="hidden"
-      whileInView="visible"
-      viewport={{ once: false, margin: "-50px" }}
-      variants={{
-        visible: { transition: { staggerChildren: 0.1 } },
-        hidden: {}
-      }}
-    >
-      {words.map((word, i) => (
-        <span key={i} className="overflow-hidden inline-block mr-[0.25em] last:mr-0">
-          <motion.span
-            className="inline-block"
-            variants={{
-              hidden: { y: "100%", rotate: 5, opacity: 0 },
-              visible: { y: 0, rotate: 0, opacity: 1, transition: { type: "spring", damping: 20, stiffness: 200 } }
-            }}
-          >
-            {word}
-          </motion.span>
-        </span>
-      ))}
-    </motion.h2>
-  );
-};
+import { certificates, aiProjects, skills } from "./data/constants";
 
 export default function App() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -349,7 +135,7 @@ export default function App() {
                   <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-4 gap-4">
                     <h3 className="font-display text-4xl md:text-5xl group-hover:opacity-50 transition-opacity">{project.title}</h3>
                     <div className="flex gap-4 text-[10px] tracking-[0.2em] uppercase">
-                      <SafeLink href={project.repo} className="hover:text-fg text-muted transition-colors">[ REPO ]</SafeLink>
+                      <SafeLink href={project.repo} className="hover:text-fg text-muted transition-colors" aria-label={`View ${project.title} repository`}>[ REPO ]</SafeLink>
                     </div>
                   </div>
                   <p className="text-lg md:text-xl font-light text-muted mb-6 max-w-2xl">{project.description}</p>
@@ -379,6 +165,7 @@ export default function App() {
                   className="flex flex-col border-b border-muted/20 pb-6 group cursor-pointer relative"
                   whileHover={{ x: 10 }}
                   transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                  aria-label={`View certificate for ${cert.title}`}
                 >
                   <div className="flex flex-col md:flex-row justify-between items-start md:items-center w-full">
                     <h3 className="font-display text-3xl md:text-5xl transition-all duration-300 flex items-center gap-4 group-hover:text-fg/70 group-hover:underline decoration-1 underline-offset-8">
@@ -452,12 +239,13 @@ export default function App() {
                 className="font-display text-3xl md:text-5xl uppercase tracking-tighter transition-opacity text-center inline-block"
                 whileHover={{ scale: 1.05, opacity: 0.7 }}
                 transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                aria-label="Email Sambhrama Khushi"
               >
                 SAMBHRMAKHUSHI@GMAIL.COM
               </motion.a>
               <div className="flex gap-12 text-[10px] tracking-[0.3em] uppercase text-muted">
-                <a href="https://github.com/Sambhrama754" target="_blank" rel="noopener noreferrer" className="hover:text-fg transition-colors">Github</a>
-                <a href="https://www.kaggle.com/sambhramakhushi" target="_blank" rel="noopener noreferrer" className="hover:text-fg transition-colors">Kaggle</a>
+                <a href="https://github.com/Sambhrama754" target="_blank" rel="noopener noreferrer" className="hover:text-fg transition-colors" aria-label="Github Profile">Github</a>
+                <a href="https://www.kaggle.com/sambhramakhushi" target="_blank" rel="noopener noreferrer" className="hover:text-fg transition-colors" aria-label="Kaggle Profile">Kaggle</a>
               </div>
               <p className="text-muted text-xs tracking-widest uppercase mt-8">
                 &copy; {new Date().getFullYear()} Sambhrama Khushi. All rights reserved.
