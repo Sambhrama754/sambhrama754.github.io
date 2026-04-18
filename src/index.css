@@ -1,9 +1,17 @@
 @import url('https://fonts.googleapis.com/css2?family=Anton&family=Space+Grotesk:wght@300;400;500&display=swap');
 @import "tailwindcss";
 
+@font-face {
+  font-family: 'NDot55';
+  src: url('/fonts/Ndot-55.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+
 @theme {
   --font-sans: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
   --font-display: "Anton", sans-serif;
+  --font-ndot: "NDot55", monospace;
 
   --color-bg: var(--theme-bg);
   --color-fg: var(--theme-fg);
@@ -38,6 +46,12 @@
   body {
     @apply bg-bg text-fg font-sans antialiased selection:bg-fg selection:text-bg;
     transition: background-color 0.5s ease, color 0.5s ease;
+  }
+  
+  :focus-visible {
+    outline: 2px solid var(--theme-fg);
+    outline-offset: 4px;
+    border-radius: 2px;
   }
   
   ::-webkit-scrollbar {
