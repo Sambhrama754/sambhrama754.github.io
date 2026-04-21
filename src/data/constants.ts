@@ -11,15 +11,15 @@ export const certificates = [
     title: "PYTHON CERTIFICATION", 
     role: "FREECODECAMP", 
     year: "IN PROGRESS", 
-    link: "https://www.freecodecamp.org/learn/python-v9",
-    status: "In Progress",
+    link: "https://www.freecodecamp.org/certification/sambhramakhushi/python-v9",
+    status: "Completed",
     details: "Learning core programming concepts, data structures, and algorithms using Python for scientific computing."
   },
   { 
     title: "CS50: INTRO TO COMPUTER SCIENCE", 
     role: "HARVARD UNIVERSITY", 
     year: "IN PROGRESS", 
-    link: "#",
+    link: "cs50.harvard.edu",
     status: "In Progress",
     details: "Harvard's premier introduction to the intellectual enterprises of computer science and the art of programming."
   },
