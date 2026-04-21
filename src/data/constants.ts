@@ -2,7 +2,7 @@ export const certificates = [
   { 
     title: "MACHINE LEARNING WITH PYTHON", 
     role: "FREECODECAMP", 
-    year: "2024", 
+    year: "2022", 
     link: "https://www.freecodecamp.org/certification/sambhrama27/machine-learning-with-python-v7",
     status: "Completed",
     details: "Comprehensive certification covering neural networks, deep learning, and practical ML algorithms using Python, TensorFlow, and Scikit-learn."
@@ -10,7 +10,7 @@ export const certificates = [
   { 
     title: "PYTHON CERTIFICATION", 
     role: "FREECODECAMP", 
-    year: "IN PROGRESS", 
+    year: "2026", 
     link: "https://www.freecodecamp.org/certification/sambhramakhushi/python-v9",
     status: "Completed",
     details: "Learning core programming concepts, data structures, and algorithms using Python for scientific computing."
@@ -19,7 +19,7 @@ export const certificates = [
     title: "CS50: INTRO TO COMPUTER SCIENCE", 
     role: "HARVARD UNIVERSITY", 
     year: "IN PROGRESS", 
-    link: "cs50.harvard.edu",
+    link: "https://cs50.harvard.edu/x/",
     status: "In Progress",
     details: "Harvard's premier introduction to the intellectual enterprises of computer science and the art of programming."
   },
